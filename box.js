@@ -14,13 +14,13 @@ transparent: true } );
 const extrusion = { steps: 1, depth: 0.5, bevelEnabled: false };
 
 // LIGHT
-const hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 0.2 );
+const hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 0.5 );
 hemiLight.color.setHSL( 1, 1, 1 );
 hemiLight.position.set( 0, 50, 0 );
 hemiLight.castShadow = true;
 
-const topLight = new THREE.PointLight("#FFFFFF", 1, 10, 1);
-topLight.position.set( -4, 50, 30 );
+const topLight = new THREE.PointLight("#FFFFFF", 1);
+topLight.position.set( -40, 150, 130 );
 topLight.castShadow = true;
 
 // FLOOR
@@ -37,19 +37,21 @@ const ratio = window.innerWidth/window.innerHeight;
 const scene = new THREE.Scene();
 scene.add( plane );
 scene.add( topLight );
+scene.add( hemiLight );
 scene.add( logo );
 
 // CAMERA
 const camera = new THREE.PerspectiveCamera( 75, ratio, 0.1, 1000 );
+camera.position.x = 0;
 camera.position.z = 70;
 camera.position.y = 20;
 
 
 // LOOP
 function loop() {
-  logo.rotation.x -= 0.0041;
-  logo.rotation.y += 0.001;
-  logo.rotation.z += 0.00321;
+  logo.rotation.x += 0.00001;
+  logo.rotation.y -= 0.0041;
+  logo.rotation.z += 0.0000321;
   renderer.render(scene, camera);
   requestAnimationFrame( loop );
 };
@@ -64,7 +66,7 @@ function makeLogo() {
   u.lineTo( 2,3 );
   u.lineTo( 1,3 );
   u.bezierCurveTo(0.5,3,0,2.5,0,2)
-  //u.lineTo( 0,2 );
+
   const ugeo = new THREE.ExtrudeGeometry( u, extrusion );
   const umesh = new THREE.Mesh( ugeo, blue );
   umesh.translateZ(extrusion.depth/2);
