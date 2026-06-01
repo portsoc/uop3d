@@ -13,7 +13,7 @@ const OUT_PAUSE_SECONDS = 15;
 const ZOOM_CYCLE_SECONDS = ZOOM_HALF_SECONDS * 2 + OUT_PAUSE_SECONDS;
 
 const ROTATION_SPEED_SCALE = 0.05;
-const Y_ROTATION_SPEED = 0.0041;
+const Z_ROTATION_SPEED = 0.0041;
 
 const DARK_SCHEME = window.matchMedia('(prefers-color-scheme: dark)');
 const BG_LIGHT = '#FFFFFF';
@@ -55,7 +55,7 @@ function makeLogo() {
   group.add(uMesh);
   group.add(pMesh);
   group.translateY(20);
-  group.scale.set(10, 10, 10);
+  group.scale.set(8, 8, 8);
   group.castShadow = true;
   group.rotation.x = Math.PI;
   return group;
@@ -173,12 +173,12 @@ function main() {
 
   function loop() {
     updateZoom();
-    const xSpeed = mouse.x * ROTATION_SPEED_SCALE;
-    const zSpeed = mouse.y * ROTATION_SPEED_SCALE;
+    const xSpeed = mouse.y * ROTATION_SPEED_SCALE;
+    const ySpeed = mouse.x * ROTATION_SPEED_SCALE;
     for (const logo of logos) {
       logo.rotation.x += xSpeed;
-      logo.rotation.y += Y_ROTATION_SPEED;
-      logo.rotation.z += zSpeed;
+      logo.rotation.y += ySpeed;
+      logo.rotation.z += Z_ROTATION_SPEED;
     }
     renderer.render(scene, camera);
     requestAnimationFrame(loop);
