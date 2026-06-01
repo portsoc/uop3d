@@ -15,6 +15,15 @@ const ZOOM_CYCLE_SECONDS = ZOOM_HALF_SECONDS * 2 + OUT_PAUSE_SECONDS;
 const ROTATION_SPEED_SCALE = 0.05;
 const Y_ROTATION_SPEED = 0.0041;
 
+const DARK_SCHEME = window.matchMedia('(prefers-color-scheme: dark)');
+const BG_LIGHT = '#FFFFFF';
+const BG_DARK = '#111111';
+const HEMI_INTENSITY_LIGHT = 0.5;
+const HEMI_INTENSITY_DARK = 0.25;
+const POINT_INTENSITY_LIGHT = 1;
+const POINT_INTENSITY_DARK = 0.7;
+const isDark = () => DARK_SCHEME.matches;
+
 const toOdd = (n) => (n % 2 === 0 ? n + 1 : n);
 
 function makeLogo() {
@@ -75,19 +84,19 @@ function createRenderer() {
   const r = new THREE.WebGLRenderer({ antialias: true });
   r.shadowMap.enabled = true;
   r.shadowMap.type = THREE.PCFSoftShadowMap;
-  r.setClearColor('#FFF');
+  r.setClearColor(isDark() ? BG_DARK : BG_LIGHT);
   r.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(r.domElement);
   return r;
 }
 
 function createLights() {
-  const hemi = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.5);
+  const hemi = new THREE.HemisphereLight(0xffffff, 0xffffff, isDark() ? HEMI_INTENSITY_DARK : HEMI_INTENSITY_LIGHT);
   hemi.color.setHSL(1, 1, 1);
   hemi.position.set(0, 50, 0);
   hemi.castShadow = true;
 
-  const top = new THREE.PointLight('#FFFFFF', 1);
+  const top = new THREE.PointLight('#FFFFFF', isDark() ? POINT_INTENSITY_DARK : POINT_INTENSITY_LIGHT);
   top.position.set(-40, 150, 130);
   top.castShadow = true;
 
@@ -148,8 +157,16 @@ function main() {
   const { camera, minDist, maxDist } = createCamera(aspect, visibleCols, rows);
 
   const scene = new THREE.Scene();
-  for (const light of createLights()) scene.add(light);
+  const lights = createLights();
+  for (const light of lights) scene.add(light);
   scene.add(logoGrid);
+
+  DARK_SCHEME.addEventListener('change', () => {
+    renderer.setClearColor(isDark() ? BG_DARK : BG_LIGHT);
+    const [hemi, top] = lights;
+    hemi.intensity = isDark() ? HEMI_INTENSITY_DARK : HEMI_INTENSITY_LIGHT;
+    top.intensity = isDark() ? POINT_INTENSITY_DARK : POINT_INTENSITY_LIGHT;
+  });
 
   const updateZoom = makeZoomController(camera, minDist, maxDist);
   const mouse = makeMouseTracker();
